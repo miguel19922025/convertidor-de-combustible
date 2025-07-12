@@ -33,91 +33,336 @@
 </head>
 <body class="antialiased">
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Convertidor de Cm a Galones</h1>
 
-        <div class="mb-6">
-            <label for="cmInput" class="block text-gray-700 text-sm font-semibold mb-2">
-                Ingresa los Centímetros (Cm):
-            </label>
-            <input
-                type="number"
-                id="cmInput"
-                class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                placeholder="Ej. 12.0"
-                step="0.5"
-                min="10.0"
-                max="25.0"
+        <!-- Vista de Selección de Capacidad del Tanque -->
+        <div id="tankCapacitySelection" class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Seleccionar Capacidad del Tanque</h1>
+            <p class="text-gray-600 mb-8">Por favor, elige la capacidad de tu tanque para continuar.</p>
+
+            <div class="mb-6">
+                <label for="tankCapacitySelect" class="block text-gray-700 text-sm font-semibold mb-2">
+                    Capacidad:
+                </label>
+                <select
+                    id="tankCapacitySelect"
+                    class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                >
+                    <option value="">Selecciona una opción</option>
+                    <option value="Tanque cilindrico 1240 gal">Tanque cilindrico 1240 gal</option>
+                    <option value="Tanque cilindrico 350gal">Tanque cilindrico 350gal</option>
+                    <option value="Tanque cubico 300gal">Tanque cubico 300gal</option>
+                    <option value="Tanque concavo 350gal">Tanque concavo 350gal</option>
+                </select>
+            </div>
+
+            <button
+                id="confirmSelectionButton"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
             >
+                Confirmar Selección
+            </button>
         </div>
 
-        <button
-            id="convertButton"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
-        >
-            Convertir a Galones
-        </button>
+        <!-- Vista del Convertidor de Cm a Galones (inicialmente oculta) -->
+        <div id="converterApp" class="hidden">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">Convertidor de Cm a Galones</h1>
+            <p id="selectedTankDisplay" class="text-lg text-gray-600 text-center mb-6">Capacidad seleccionada: </p>
 
-        <div id="resultDisplay" class="mt-6 p-4 text-lg font-semibold rounded-lg bg-blue-100 text-blue-800 border border-blue-200 hidden">
-            <!-- Aquí se mostrará el resultado -->
+            <div class="mb-6">
+                <label for="cmInput" class="block text-gray-700 text-sm font-semibold mb-2">
+                    Ingresa los Centímetros (Cm):
+                </label>
+                <input
+                    type="number"
+                    id="cmInput"
+                    class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Ej. 12.0"
+                    step="0.01"
+                >
+            </div>
+
+            <button
+                id="convertButton"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
+            >
+                Convertir a Galones
+            </button>
+
+            <div id="resultDisplay" class="mt-6 p-4 text-lg font-semibold rounded-lg bg-blue-100 text-blue-800 border border-blue-200 hidden">
+                <!-- Aquí se mostrará el resultado -->
+            </div>
+
+            <!-- Botón para volver a la selección de capacidad -->
+            <button
+                id="backButton"
+                class="w-full mt-6 bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
+            >
+                Volver a Selección de Tanque
+            </button>
         </div>
-
-        <!-- La tabla de conversión ha sido eliminada de aquí -->
     </div>
 
     <script>
-        // Datos de conversión obtenidos de la imagen
-        // Se utiliza un Map para una búsqueda eficiente por clave numérica
-        const conversionData = new Map([
-            [10.0, 44.6],
-            [10.5, 48.0],
-            [11.0, 51.4],
-            [11.5, 54.9],
-            [12.0, 58.4],
-            [12.5, 62.0], // Asumiendo 12.5 para el '1' en la tabla, siguiendo el patrón.
-            [13.0, 65.7],
-            [13.5, 69.4],
-            [14.0, 73.2],
-            [14.5, 77.1],
-            [15.0, 81.0],
-            [15.5, 85.0],
-            [16.0, 89.0],
-            [16.5, 93.1],
-            [17.0, 97.3],
-            [17.5, 101.5],
-            [18.0, 105.7],
-            [18.5, 110.0],
-            [19.0, 114.3],
-            [19.5, 118.7],
-            [20.0, 123.2],
-            [20.5, 127.7],
-            [21.0, 132.2],
-            [21.5, 136.8],
-            [22.0, 141.4],
-            [22.5, 146.0],
-            [23.0, 150.7],
-            [23.5, 155.5],
-            [24.0, 160.2],
-            [24.5, 165.1],
+        // --- Tablas de Conversión para cada tipo de tanque ---
+        // La tabla genérica original (usada si no se encuentra una específica)
+        const genericConversionData = new Map([
+            [10.0, 44.6], [10.5, 48.0], [11.0, 51.4], [11.5, 54.9], [12.0, 58.4],
+            [12.5, 62.0], [13.0, 65.7], [13.5, 69.4], [14.0, 73.2], [14.5, 77.1],
+            [15.0, 81.0], [15.5, 85.0], [16.0, 89.0], [16.5, 93.1], [17.0, 97.3],
+            [17.5, 101.5], [18.0, 105.7], [18.5, 110.0], [19.0, 114.3], [19.5, 118.7],
+            [20.0, 123.2], [20.5, 127.7], [21.0, 132.2], [21.5, 136.8], [22.0, 141.4],
+            [22.5, 146.0], [23.0, 150.7], [23.5, 155.5], [24.0, 160.2], [24.5, 165.1],
             [25.0, 169.9]
         ]);
 
-        // Obtener referencias a los elementos del DOM
+        // TABLA PARA "Tanque cilindrico 1240 gal" (Valores proporcionados por el usuario)
+        const tank1240GalData = new Map([
+            [10.0, 44.6], [10.5, 48.0], [11.0, 51.4], [11.5, 54.9], [12.0, 58.4],
+            [12.5, 62.0],
+            [13.0, 65.7], [13.5, 69.4], [14.0, 73.2], [14.5, 77.1], [15.0, 81.0],
+            [15.5, 85.0], [16.0, 89.0], [16.5, 93.1], [17.0, 97.3], [17.5, 101.5],
+            [18.0, 105.7], [18.5, 110.0], [19.0, 114.3], [19.5, 118.7], [20.0, 123.2],
+            [20.5, 127.7], [21.0, 132.2], [21.5, 136.8], [22.0, 141.4], [22.5, 146.0],
+            [23.0, 150.7], [23.5, 155.5], [24.0, 160.2], [24.5, 165.1], [25.0, 169.9],
+            [25.5, 174.8], [26.0, 179.7], [26.5, 184.7], [27.0, 189.7], [27.5, 194.7],
+            [28.0, 199.8], [28.5, 204.9], [29.0, 210.0], [29.5, 215.2], [30.0, 220.4],
+            [30.5, 225.6], [31.0, 230.8], [31.5, 236.1], [32.0, 241.4], [32.5, 246.8],
+            [33.0, 252.1], [33.5, 257.5], [34.0, 263.0], [34.5, 268.4], [35.0, 273.9],
+            [35.5, 279.4], [36.0, 284.9], [36.5, 290.4], [37.0, 296.0], [37.5, 301.6],
+            [38.0, 307.2], [38.5, 312.8], [39.0, 318.5], [39.5, 324.2], [40.0, 329.9],
+            [40.5, 335.6], [41.0, 341.3], [41.5, 347.1], [42.0, 352.9], [42.5, 358.6],
+            [43.0, 364.4], [43.5, 370.3], [44.0, 376.1], [44.5, 382.0], [45.0, 387.8],
+            [45.5, 393.7], [46.0, 399.6], [46.5, 405.6], [47.0, 411.5], [47.5, 417.4],
+            [48.0, 423.4],
+            [48.5, 429.4],
+            [49.0, 435.4], [49.5, 441.4], [50.0, 447.4], [50.5, 453.4], [51.0, 459.4],
+            [51.5, 465.5], [52.0, 471.5], [52.5, 477.6], [53.0, 483.6], [53.5, 489.7],
+            [54.0, 495.8], [54.5, 501.9], [55.0, 508.0], [55.5, 514.1], [56.0, 520.2],
+            [56.5, 526.4], [57.0, 532.5], [57.5, 538.6], [58.0, 544.8], [58.5, 550.9],
+            [59.0, 557.1], [59.5, 563.2], [60.0, 569.4], [60.5, 575.6], [61.0, 581.7],
+            [61.5, 587.9], [62.0, 594.1], [62.5, 600.3], [63.0, 606.4], [63.5, 612.6],
+            [64.0, 618.8], [64.5, 625.0], [65.0, 631.2], [65.5, 637.3], [66.0, 643.5],
+            [66.5, 649.7], [67.0, 655.9], [67.5, 662.1], [68.0, 668.2], [68.5, 674.4],
+            [69.0, 680.6], [69.5, 686.7], [69.5, 686.7], // Repetido en la tabla original
+            [70.0, 692.9], [70.5, 699.1], [71.0, 705.2], [71.5, 711.4], [72.0, 717.5],
+            [72.5, 723.7], [73.0, 729.8], [73.5, 735.9], [74.0, 742.1], [74.5, 748.2],
+            [75.0, 754.3], [75.5, 760.4], [76.0, 766.5], [76.5, 772.6], [77.0, 778.7],
+            [77.5, 784.7], [78.0, 790.8], [78.5, 796.9], [79.0, 802.9], [79.5, 808.9],
+            [80.0, 814.9], [80.5, 821.0], [81.0, 827.0], [81.5, 832.9], [82.0, 838.9],
+            [82.5, 844.9], [83.0, 850.8], [83.5, 856.7], [84.0, 862.7], [84.5, 868.6],
+            [85.0, 874.5], [85.5, 880.3], [86.0, 886.2], [86.5, 892.0], [87.0, 897.9],
+            [87.5, 903.7], [88.0, 909.5], [88.5, 915.2], [89.0, 921.0], [89.5, 926.7],
+            [90.0, 932.4], [90.5, 938.1], [91.0, 943.8], [91.5, 949.5], [92.0, 955.1],
+            [92.5, 960.7], [93.0, 966.3], [93.5, 971.9], [94.0, 977.4], [94.5, 982.9],
+            [95.0, 988.4], [95.5, 993.9], [96.0, 999.3], [96.5, 1004.8], [97.0, 1010.2],
+            [97.5, 1015.5], [98.0, 1020.9], [98.5, 1026.2], [99.0, 1031.5], [99.5, 1036.7],
+            [100.0, 1041.9], [100.5, 1047.1], [101.0, 1052.3], [101.5, 1057.4], [102.0, 1062.5],
+            [102.5, 1067.6], [103.0, 1072.6], [103.5, 1077.6], [104.0, 1082.6], [104.5, 1087.5],
+            [105.0, 1092.4], [105.5, 1097.3], [106.0, 1102.1], [106.5, 1106.8], [107.0, 1111.6],
+            [107.5, 1116.3], [108.0, 1120.9], [108.5, 1125.6], [109.0, 1130.1], [109.5, 1134.7],
+            [110.0, 1139.1], [110.5, 1143.6], [111.0, 1148.0], [111.5, 1152.3], [112.0, 1156.6],
+            [112.5, 1160.9], [113.0, 1165.0],
+            [113.5, 1169.2], [114.0, 1173.3], [114.5, 1177.3], [115.0, 1181.3], [115.5, 1185.2],
+            [116.0, 1189.1], [116.5, 1192.9],
+            [117.0, 1196.6],
+            [117.5, 1200.3], [118.0, 1203.9], [118.5, 1207.4], [119.0, 1210.9], [119.5, 1214.3],
+            [120.0, 1217.7], [120.5, 1220.9], [121.0, 1224.1], [121.5, 1227.2], [122.0, 1230.2],
+            [122.5, 1233.1], [123.0, 1236.0], [123.5, 1238.7], [124.0, 1241.4], [124.5, 1243.9],
+            [125.0, 1246.3], [125.5, 1248.7], [126.0, 1250.9], [126.5, 1252.9], [127.0, 1254.8],
+            [127.5, 1256.6], [128.0, 1258.2], [128.5, 1259.7], [129.0, 1260.9], [129.5, 1261.8],
+            [130.0, 1262.3]
+        ]);
+
+        // TABLA PARA "Tanque cilindrico 350gal" (Valores proporcionados por el usuario)
+        const tank350GalData = new Map([
+            [10, 19.4], [11, 22.4], [12, 25.4], [13, 28.5], [14, 31.8],
+            [15, 35.1], [16, 38.6], [17, 42.1], [18, 45.7], [19, 49.4],
+            [20, 53.2], [21, 57.0], [22, 60.9], [23, 64.9], [24, 68.9],
+            [25, 73.0], [26, 77.2], [27, 81.4], [28, 85.6], [29, 89.9],
+            [30, 94.2], [31, 98.6], [32, 103.0], [33, 107.5], [34, 112.0],
+            [35, 116.5], [36, 121.0], [37, 125.6], [38, 130.2], [39, 134.9],
+            [40, 139.5], [41, 144.2], [42, 148.9], [43, 153.6], [44, 158.3],
+            [45, 163.0], [46, 167.7], [47, 172.5], [48, 177.2], [49, 182.0],
+            [50, 186.7], [51, 191.5], [52, 196.2], [53, 201.0], [54, 205.7],
+            [55, 210.5], [56, 215.2], [57, 219.9], [58, 224.6], [59, 229.3],
+            [60, 234.0], [61, 238.6], [62, 243.2], [63, 247.8], [64, 252.4],
+            [65, 257.0], [66, 261.5], [67, 266.0], [68, 270.4], [69, 274.9],
+            [70, 279.2], [71, 283.6], [72, 287.9], [73, 292.1], [74, 296.3],
+            [75, 300.5], [76, 304.5], [77, 308.6], [78, 312.5], [79, 316.5],
+            [80, 320.3], [81, 324.1], [82, 327.8], [83, 331.4], [84, 334.9],
+            [85, 338.3], [86, 341.7], [87, 344.9], [88, 348.1], [89, 351.1],
+            [90, 354.0], [91, 356.8], [92, 359.5], [93, 362.0], [94, 364.3],
+            [95, 366.5], [96, 368.5], [97, 370.2], [98, 371.7], [99, 372.8],
+            [100, 373.5]
+        ]);
+
+        // TABLA PARA "Tanque cubico 300gal" (Valores proporcionados por el usuario)
+        const tank300CubGalData = new Map([
+            [1, 4.02], [2, 8.03], [3, 12.05], [4, 16.07], [5, 20.08],
+            [6, 24.10], [7, 28.11], [8, 32.13], [9, 36.15], [10, 40.16],
+            [11, 44.18], [12, 48.20], [13, 52.21], [14, 56.23], [15, 60.25],
+            [16, 64.26], [17, 68.28], [18, 72.29], [19, 76.31], [20, 80.33],
+            [21, 84.34], [22, 88.36], [23, 92.38], [24, 96.39], [25, 100.41],
+            [26, 104.43], [27, 108.44], [28, 112.46], [29, 116.47], [30, 120.49],
+            [31, 124.51], [32, 128.52], [33, 132.54], [34, 136.56], [35, 140.57],
+            [36, 144.59], [37, 148.61], [38, 152.62], [39, 156.64], [40, 160.66],
+            [41, 164.67], [42, 168.69], [43, 172.70], [44, 176.72], [45, 180.74],
+            [46, 184.75], [47, 188.77], [48, 192.79], [49, 196.80], [50, 200.82],
+            [51, 204.84], [52, 208.85], [53, 212.87], [54, 216.88], [55, 220.90],
+            [56, 224.92], [57, 228.93], [58, 232.95], [59, 236.97], [60, 240.98],
+            [61, 245.00], [62, 249.02], [63, 253.03], [64, 257.05], [65, 261.06],
+            [66, 265.08], [67, 269.10], [68, 273.11], [69, 277.13], [70, 281.15],
+            [71, 285.16], [72, 289.18], [73, 293.20], [74, 297.21], [75, 301.23]
+        ]);
+
+        // TABLA PARA "Tanque concavo 350gal" (Valores proporcionados por el usuario)
+        const tankConcavo350GalData = new Map([
+            [82.3, 300], [80.6, 295], [79, 290], [77.5, 285], [76, 280],
+            [74.5, 275], [73.2, 270], [71.8, 265], [70.5, 260], [69.2, 255],
+            [67.9, 250], [66.7, 245], [65.4, 240], [64.2, 235], [63, 230],
+            [61.8, 225], [60.6, 220], [59.5, 215], [58.3, 210], [57.2, 205],
+            [56, 200], [54.9, 195], [53.7, 190], [52.6, 185], [51.5, 180],
+            [50.4, 175], [49.2, 170], [48, 165], [47, 160], [45.9, 155],
+            [44.8, 150], [43.6, 145], [42.3, 140], [41.2, 135], [40, 130],
+            [38.9, 125], [37.8, 120], [36.6, 115], [35.5, 110], [34.4, 105],
+            [33.4, 100], [31.9, 95], [30.8, 90], [29.5, 85], [28.3, 80],
+            [27, 75], [25.8, 70], [24.5, 65], [23.1, 60], [21.8, 55],
+            [20.4, 50], [18.9, 45], [17.4, 40], [15.9, 35], [14.3, 30],
+            [12.7, 25], [10.9, 20], [8.9, 15]
+        ]);
+
+
+        // Objeto para almacenar las tablas de conversión específicas por tipo de tanque
+        const tankSpecificConversionData = {
+            "Tanque cilindrico 1240 gal": tank1240GalData,
+            "Tanque cilindrico 350gal": tank350GalData,
+            "Tanque cubico 300gal": tank300CubGalData,
+            "Tanque concavo 350gal": tankConcavo350GalData
+        };
+
+        let currentConversionData = genericConversionData; // La tabla activa actualmente
+        let selectedTankType = ""; // Para almacenar el tipo de tanque seleccionado
+
+        // Obtener referencias a los elementos del DOM para ambas vistas
+        const tankCapacitySelection = document.getElementById('tankCapacitySelection');
+        const tankCapacitySelect = document.getElementById('tankCapacitySelect');
+        const confirmSelectionButton = document.getElementById('confirmSelectionButton');
+        const converterApp = document.getElementById('converterApp');
+        const selectedTankDisplay = document.getElementById('selectedTankDisplay'); // Elemento para mostrar el tanque seleccionado
+        const backButton = document.getElementById('backButton'); // Nuevo botón de volver
+
         const cmInput = document.getElementById('cmInput');
         const convertButton = document.getElementById('convertButton');
         const resultDisplay = document.getElementById('resultDisplay');
-        // const conversionTableContainer = document.getElementById('conversionTableContainer'); // Ya no se necesita
 
         /**
-         * Genera y muestra la tabla de conversión en el DOM.
-         * Esta función ya no se llama, pero se mantiene el código de datos.
+         * Realiza una interpolación lineal para encontrar un valor de galones.
+         * @param {number} cmValue - El valor de centímetros para el que se busca el galón.
+         * @param {Map<number, number>} dataMap - El mapa de datos de conversión (Cm a Glns).
+         * @returns {number|undefined} El valor de galones interpolado, o undefined si no hay suficientes datos.
          */
-        function generateConversionTable() {
-            // Este código ya no es necesario para la visualización,
-            // pero los datos 'conversionData' siguen siendo usados por 'convertCmToGlns'.
+        function interpolateGlns(cmValue, dataMap) {
+            // Convierte el mapa a un array de pares [cm, glns] y lo ordena por cm
+            const sortedData = Array.from(dataMap.entries()).sort((a, b) => a[0] - b[0]);
+
+            if (sortedData.length === 0) {
+                return undefined; // No hay datos para interpolar
+            }
+
+            // Si el valor está fuera del rango de la tabla, usa el valor más cercano
+            if (cmValue <= sortedData[0][0]) {
+                return sortedData[0][1];
+            }
+            if (cmValue >= sortedData[sortedData.length - 1][0]) {
+                return sortedData[sortedData.length - 1][1];
+            }
+
+            // Encuentra los dos puntos entre los que se encuentra cmValue
+            let lowerCm = sortedData[0][0];
+            let upperCm = sortedData[sortedData.length - 1][0];
+            let lowerGlns = sortedData[0][1];
+            let upperGlns = sortedData[sortedData.length - 1][1];
+
+            for (let i = 0; i < sortedData.length - 1; i++) {
+                if (cmValue >= sortedData[i][0] && cmValue <= sortedData[i + 1][0]) {
+                    lowerCm = sortedData[i][0];
+                    upperCm = sortedData[i + 1][0];
+                    lowerGlns = sortedData[i][1];
+                    upperGlns = sortedData[i + 1][1];
+                    break;
+                }
+            }
+
+            // Realiza la interpolación lineal
+            if (upperCm === lowerCm) { // Evita división por cero si los puntos son idénticos
+                return lowerGlns;
+            }
+            const interpolatedGlns = lowerGlns + (upperGlns - lowerGlns) * ((cmValue - lowerCm) / (upperCm - lowerCm));
+            return interpolatedGlns;
+        }
+
+        /**
+         * Muestra un mensaje temporal en el área de resultados.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {'success'|'error'|'warning'} type - El tipo de mensaje para aplicar estilos.
+         */
+        function showTempMessage(message, type) {
+            const tempResultDisplay = document.createElement('div');
+            tempResultDisplay.textContent = message;
+            tempResultDisplay.classList.add('mt-4', 'p-3', 'rounded-lg', 'font-semibold', 'text-center');
+
+            if (type === 'error') {
+                tempResultDisplay.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
+            } else if (type === 'warning') {
+                tempResultDisplay.classList.add('bg-yellow-100', 'text-yellow-800', 'border', 'border-yellow-200');
+            }
+
+            tankCapacitySelection.appendChild(tempResultDisplay);
+
+            setTimeout(() => {
+                tempResultDisplay.remove();
+            }, 3000); // El mensaje desaparece después de 3 segundos
+        }
+
+        /**
+         * Maneja la navegación de la vista de selección a la vista del convertidor.
+         */
+        function showConverter() {
+            selectedTankType = tankCapacitySelect.value; // Obtiene el valor seleccionado
+
+            if (selectedTankType === "") {
+                showTempMessage('Por favor, selecciona una capacidad de tanque.', 'error');
+                return;
+            }
+
+            // Actualiza la tabla de conversión activa según la selección
+            // Si no se encuentra una tabla específica, se usará la genérica por defecto.
+            currentConversionData = tankSpecificConversionData[selectedTankType] || genericConversionData;
+
+            // Muestra el tipo de tanque seleccionado en la vista del convertidor
+            selectedTankDisplay.textContent = `Capacidad seleccionada: ${selectedTankType}`;
+
+            tankCapacitySelection.classList.add('hidden'); // Oculta la vista de selección
+            converterApp.classList.remove('hidden'); // Muestra la vista del convertidor
+        }
+
+        /**
+         * Maneja la navegación de la vista del convertidor a la vista de selección.
+         */
+        function goBackToSelection() {
+            converterApp.classList.add('hidden'); // Oculta la vista del convertidor
+            tankCapacitySelection.classList.remove('hidden'); // Muestra la vista de selección
+
+            // Limpia el input y el resultado del convertidor al volver
+            cmInput.value = '';
+            resultDisplay.classList.add('hidden');
+            resultDisplay.textContent = '';
+            tankCapacitySelect.value = ''; // Opcional: resetea la selección del tanque
         }
 
         /**
          * Realiza la conversión de Centímetros a Galones.
+         * Asegura que los valores de entrada y salida se muestren con dos decimales.
          */
         function convertCmToGlns() {
             const cmValue = parseFloat(cmInput.value); // Obtiene el valor del input y lo convierte a número
@@ -128,15 +373,20 @@
                 return;
             }
 
-            // Busca el valor en la tabla de conversión
-            const glnsValue = conversionData.get(cmValue);
+            // Intenta obtener el valor exacto primero
+            let glnsValue = currentConversionData.get(cmValue);
+
+            if (glnsValue === undefined) {
+                // Si no hay una coincidencia exacta, interpola
+                glnsValue = interpolateGlns(cmValue, currentConversionData);
+            }
 
             if (glnsValue !== undefined) {
-                // Si se encuentra una coincidencia exacta, muestra el resultado
-                showResult(`Para ${cmValue.toFixed(1)} Cm, el valor es: ${glnsValue.toFixed(1)} Glns.`, 'success');
+                // Muestra el resultado (exacto o interpolado) con dos decimales
+                showResult(`Para ${cmValue.toFixed(2)} Cm, el valor es: ${glnsValue.toFixed(2)} Glns.`, 'success');
             } else {
-                // Si no se encontró una coincidencia exacta
-                showResult(`No se encontró un valor exacto para ${cmValue.toFixed(1)} Cm en la tabla. Por favor, ingresa uno de los valores listados.`, 'warning');
+                // Si no se pudo calcular (ej. tabla vacía o fuera de rango sin interpolación)
+                showResult(`No se pudo calcular el valor para ${cmValue.toFixed(2)} Cm en la tabla de ${selectedTankType}.`, 'error');
             }
         }
 
@@ -160,11 +410,14 @@
             }
         }
 
+        // Asigna el evento click al botón de confirmación de selección de tanque
+        confirmSelectionButton.addEventListener('click', showConverter);
+
         // Asigna el evento click al botón de conversión
         convertButton.addEventListener('click', convertCmToGlns);
 
-        // Ya no se llama a generateConversionTable en window.onload
-        // window.onload = generateConversionTable;
+        // Asigna el evento click al botón de volver
+        backButton.addEventListener('click', goBackToSelection);
 
         // El registro del Service Worker ha sido eliminado para evitar errores en el entorno de previsualización
         /*
