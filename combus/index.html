@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convertidor de Cm a Galones</title>
+    <!-- El enlace al manifiesto de la aplicación web (PWA) ha sido eliminado para evitar errores en el entorno de previsualización -->
+    <!-- <link rel="manifest" href="/manifest.json"> -->
     <!-- Carga de Tailwind CSS para estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -18,31 +20,6 @@
             margin: 0;
             padding: 20px; /* Espaciado alrededor del contenido */
             box-sizing: border-box; /* Incluye padding en el tamaño total */
-        }
-        /* Estilos para la tabla */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 0.75rem; /* rounded-xl */
-            overflow: hidden; /* Para que los bordes redondeados se apliquen a la tabla */
-        }
-        th, td {
-            border: 1px solid #e2e8f0; /* Color de borde de tabla */
-            padding: 12px 15px;
-            text-align: center;
-        }
-        th {
-            background-color: #4a5568; /* Color de encabezado de tabla */
-            color: white;
-            font-weight: 600;
-        }
-        tr:nth-child(even) {
-            background-color: #f7fafc; /* Color de fila par */
-        }
-        tr:hover {
-            background-color: #edf2f7; /* Color de fila al pasar el ratón */
         }
         /* Estilo para el mensaje de error/resultado */
         #resultDisplay {
@@ -84,12 +61,7 @@
             <!-- Aquí se mostrará el resultado -->
         </div>
 
-        <div class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Tabla de Conversión (Referencia)</h2>
-            <div id="conversionTableContainer" class="overflow-x-auto">
-                <!-- La tabla se generará aquí con JavaScript -->
-            </div>
-        </div>
+        <!-- La tabla de conversión ha sido eliminada de aquí -->
     </div>
 
     <script>
@@ -133,25 +105,15 @@
         const cmInput = document.getElementById('cmInput');
         const convertButton = document.getElementById('convertButton');
         const resultDisplay = document.getElementById('resultDisplay');
-        const conversionTableContainer = document.getElementById('conversionTableContainer');
+        // const conversionTableContainer = document.getElementById('conversionTableContainer'); // Ya no se necesita
 
         /**
          * Genera y muestra la tabla de conversión en el DOM.
+         * Esta función ya no se llama, pero se mantiene el código de datos.
          */
         function generateConversionTable() {
-            let tableHTML = '<table><thead><tr><th>Cm</th><th>Glns.</th></tr></thead><tbody>';
-            // Itera sobre los datos de conversión para construir las filas de la tabla
-            conversionData.forEach((glns, cm) => {
-                let rowClass = '';
-                // Aplica clases para resaltar las filas si coinciden con los ejemplos de la imagen
-                if (cm === 12.0) {
-                    rowClass = 'bg-yellow-200'; // Similar al resaltado amarillo en la imagen
-                } else if (cm === 13.5) {
-                    rowClass = 'bg-green-200'; // Similar al resaltado verde en la imagen
-                }
-                tableHTML += `<tr class="${rowClass}"><td>${cm.toFixed(1)}</td><td>${glns.toFixed(1)}</td></tr>`;
-            });
-            conversionTableContainer.innerHTML = tableHTML;
+            // Este código ya no es necesario para la visualización,
+            // pero los datos 'conversionData' siguen siendo usados por 'convertCmToGlns'.
         }
 
         /**
@@ -173,7 +135,7 @@
                 // Si se encuentra una coincidencia exacta, muestra el resultado
                 showResult(`Para ${cmValue.toFixed(1)} Cm, el valor es: ${glnsValue.toFixed(1)} Glns.`, 'success');
             } else {
-                // Si no se encuentra una coincidencia exacta
+                // Si no se encontró una coincidencia exacta
                 showResult(`No se encontró un valor exacto para ${cmValue.toFixed(1)} Cm en la tabla. Por favor, ingresa uno de los valores listados.`, 'warning');
             }
         }
@@ -201,8 +163,23 @@
         // Asigna el evento click al botón de conversión
         convertButton.addEventListener('click', convertCmToGlns);
 
-        // Genera la tabla de conversión al cargar la página
-        window.onload = generateConversionTable;
+        // Ya no se llama a generateConversionTable en window.onload
+        // window.onload = generateConversionTable;
+
+        // El registro del Service Worker ha sido eliminado para evitar errores en el entorno de previsualización
+        /*
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/combus/service-worker.js') // Asegúrate de que la ruta sea correcta
+                    .then((registration) => {
+                        console.log('Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('Fallo el registro del Service Worker:', error);
+                    });
+            });
+        }
+        */
     </script>
 </body>
 </html>
