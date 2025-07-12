@@ -1,14 +1,14 @@
 // service-worker.js
 const CACHE_NAME = 'fuel-converter-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/service-worker.js',
+  '/combus/', // La raíz de tu aplicación ahora será /combus/
+  '/combus/index.html',
+  '/combus/manifest.json',
+  '/combus/service-worker.js',
   'https://cdn.tailwindcss.com', // Cacha también Tailwind CSS
   // Agrega aquí todas las rutas a tus iconos
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/combus/icons/icon-192x192.png',
+  '/combus/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
