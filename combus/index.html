@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de Cm a Galones</title>
+    <!-- Carga de Tailwind CSS para estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados para la fuente y el cuerpo */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Un color de fondo suave */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
+            margin: 0;
+            padding: 20px; /* Espaciado alrededor del contenido */
+            box-sizing: border-box; /* Incluye padding en el tamaño total */
+        }
+        /* Estilos para la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem; /* rounded-xl */
+            overflow: hidden; /* Para que los bordes redondeados se apliquen a la tabla */
+        }
+        th, td {
+            border: 1px solid #e2e8f0; /* Color de borde de tabla */
+            padding: 12px 15px;
+            text-align: center;
+        }
+        th {
+            background-color: #4a5568; /* Color de encabezado de tabla */
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f7fafc; /* Color de fila par */
+        }
+        tr:hover {
+            background-color: #edf2f7; /* Color de fila al pasar el ratón */
+        }
+        /* Estilo para el mensaje de error/resultado */
+        #resultDisplay {
+            min-height: 40px; /* Asegura un espacio mínimo para el mensaje */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Convertidor de Cm a Galones</h1>
+
+        <div class="mb-6">
+            <label for="cmInput" class="block text-gray-700 text-sm font-semibold mb-2">
+                Ingresa los Centímetros (Cm):
+            </label>
+            <input
+                type="number"
+                id="cmInput"
+                class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                placeholder="Ej. 12.0"
+                step="0.5"
+                min="10.0"
+                max="25.0"
+            >
+        </div>
+
+        <button
+            id="convertButton"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105"
+        >
+            Convertir a Galones
+        </button>
+
+        <div id="resultDisplay" class="mt-6 p-4 text-lg font-semibold rounded-lg bg-blue-100 text-blue-800 border border-blue-200 hidden">
+            <!-- Aquí se mostrará el resultado -->
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Tabla de Conversión (Referencia)</h2>
+            <div id="conversionTableContainer" class="overflow-x-auto">
+                <!-- La tabla se generará aquí con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de conversión obtenidos de la imagen
+        // Se utiliza un Map para una búsqueda eficiente por clave numérica
+        const conversionData = new Map([
+            [10.0, 44.6],
+            [10.5, 48.0],
+            [11.0, 51.4],
+            [11.5, 54.9],
+            [12.0, 58.4],
+            [12.5, 62.0], // Asumiendo 12.5 para el '1' en la tabla, siguiendo el patrón.
+            [13.0, 65.7],
+            [13.5, 69.4],
+            [14.0, 73.2],
+            [14.5, 77.1],
+            [15.0, 81.0],
+            [15.5, 85.0],
+            [16.0, 89.0],
+            [16.5, 93.1],
+            [17.0, 97.3],
+            [17.5, 101.5],
+            [18.0, 105.7],
+            [18.5, 110.0],
+            [19.0, 114.3],
+            [19.5, 118.7],
+            [20.0, 123.2],
+            [20.5, 127.7],
+            [21.0, 132.2],
+            [21.5, 136.8],
+            [22.0, 141.4],
+            [22.5, 146.0],
+            [23.0, 150.7],
+            [23.5, 155.5],
+            [24.0, 160.2],
+            [24.5, 165.1],
+            [25.0, 169.9]
+        ]);
+
+        // Obtener referencias a los elementos del DOM
+        const cmInput = document.getElementById('cmInput');
+        const convertButton = document.getElementById('convertButton');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const conversionTableContainer = document.getElementById('conversionTableContainer');
+
+        /**
+         * Genera y muestra la tabla de conversión en el DOM.
+         */
+        function generateConversionTable() {
+            let tableHTML = '<table><thead><tr><th>Cm</th><th>Glns.</th></tr></thead><tbody>';
+            // Itera sobre los datos de conversión para construir las filas de la tabla
+            conversionData.forEach((glns, cm) => {
+                let rowClass = '';
+                // Aplica clases para resaltar las filas si coinciden con los ejemplos de la imagen
+                if (cm === 12.0) {
+                    rowClass = 'bg-yellow-200'; // Similar al resaltado amarillo en la imagen
+                } else if (cm === 13.5) {
+                    rowClass = 'bg-green-200'; // Similar al resaltado verde en la imagen
+                }
+                tableHTML += `<tr class="${rowClass}"><td>${cm.toFixed(1)}</td><td>${glns.toFixed(1)}</td></tr>`;
+            });
+            conversionTableContainer.innerHTML = tableHTML;
+        }
+
+        /**
+         * Realiza la conversión de Centímetros a Galones.
+         */
+        function convertCmToGlns() {
+            const cmValue = parseFloat(cmInput.value); // Obtiene el valor del input y lo convierte a número
+
+            // Valida si el input es un número válido
+            if (isNaN(cmValue)) {
+                showResult('Por favor, ingresa un valor numérico válido.', 'error');
+                return;
+            }
+
+            // Busca el valor en la tabla de conversión
+            const glnsValue = conversionData.get(cmValue);
+
+            if (glnsValue !== undefined) {
+                // Si se encuentra una coincidencia exacta, muestra el resultado
+                showResult(`Para ${cmValue.toFixed(1)} Cm, el valor es: ${glnsValue.toFixed(1)} Glns.`, 'success');
+            } else {
+                // Si no se encuentra una coincidencia exacta
+                showResult(`No se encontró un valor exacto para ${cmValue.toFixed(1)} Cm en la tabla. Por favor, ingresa uno de los valores listados.`, 'warning');
+            }
+        }
+
+        /**
+         * Muestra un mensaje en el área de resultados con un estilo específico.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {'success'|'error'|'warning'} type - El tipo de mensaje para aplicar estilos.
+         */
+        function showResult(message, type) {
+            resultDisplay.textContent = message; // Establece el texto del resultado
+            resultDisplay.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'border-blue-200', 'bg-red-100', 'text-red-800', 'border-red-200', 'bg-yellow-100', 'text-yellow-800', 'border-yellow-200');
+            resultDisplay.classList.add('block'); // Muestra el elemento
+
+            // Aplica estilos basados en el tipo de mensaje
+            if (type === 'success') {
+                resultDisplay.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+            } else if (type === 'error') {
+                resultDisplay.classList.add('bg-red-100', 'text-red-800', 'border-red-200');
+            } else if (type === 'warning') {
+                resultDisplay.classList.add('bg-yellow-100', 'text-yellow-800', 'border-yellow-200');
+            }
+        }
+
+        // Asigna el evento click al botón de conversión
+        convertButton.addEventListener('click', convertCmToGlns);
+
+        // Genera la tabla de conversión al cargar la página
+        window.onload = generateConversionTable;
+    </script>
+</body>
+</html>
